@@ -122,9 +122,7 @@ Host and port should be delimited with ':'."
   (pop-to-buffer asrepl-repl-buffer-name))
 
 (defun asrepl-send-code (code-str)
-  "Send CODE-STR.
-
-CODE-STR should be a lisp form."
+  "Send CODE-STR, a Lisp form."
   (interactive "sCode: ")
   (let ((here (point))
         (original-buffer (current-buffer))
@@ -141,11 +139,8 @@ CODE-STR should be a lisp form."
           (goto-char (point-max))
         (goto-char here)))))
 
-(defun asrepl-send-region (start end &optional pre post)
-  "Send a region bounded by START and END.
-
-Optional arguments PRE and POST are strings to insert before
-and after the region about to be sent, respectively."
+(defun asrepl-send-region (start end)
+  "Send a region bounded by START and END."
   (interactive "r")
   (let ((here (point))
         (original-buffer (current-buffer))
@@ -155,14 +150,10 @@ and after the region about to be sent, respectively."
       ;; switch to asrepl buffer to prepare for appending
       (set-buffer repl-buffer)
       (goto-char (point-max))
-      (when pre
-        (insert pre))
       ;; switch back
       (set-buffer original-buffer)
       (append-to-buffer repl-buffer start end)
       (set-buffer repl-buffer)
-      (when post
-        (insert post))
       (comint-send-input)
       (set-buffer original-buffer)
       (goto-char here))))
