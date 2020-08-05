@@ -173,11 +173,29 @@ Host and port should be delimited with ':'."
     (when (and start end)
       (asrepl-send-region start end))))
 
+(defun asrepl-insert-last-output ()
+  "Insert last evaluation result."
+  (interactive)
+  (let ((here (point))
+        (original-buffer (current-buffer))
+        (repl-buffer (get-buffer asrepl-repl-buffer-name))
+        (last-output ""))
+    (if (not repl-buffer)
+        (message (format "%s is missing..." asrepl-repl-buffer-name))
+      ;; switch to asrepl buffer to prepare for appending
+      (set-buffer repl-buffer)
+      (setq last-output
+            (buffer-substring-no-properties comint-last-input-end
+                                            (first comint-last-prompt)))
+      (set-buffer original-buffer)
+      (insert last-output))))
+
 (defvar asrepl-interaction-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-b" 'asrepl-send-buffer)
     (define-key map "\C-c\C-e" 'asrepl-send-expression-at-point)
     (define-key map "\C-c\C-r" 'asrepl-send-region)
+    (define-key map "\C-c\C-i" 'asrepl-insert-last-output)
     (define-key map "\C-c\C-z" 'asrepl-switch-to-repl)
     (easy-menu-define asrepl-interaction-mode-map map
       "A socket REPL Interaction Mode Menu"
@@ -185,6 +203,7 @@ Host and port should be delimited with ':'."
         ["Send buffer" asrepl-send-buffer t]
         ["Send expression at point" asrepl-send-expression-at-point t]
         ["Send region" asrepl-send-region t]
+        ["Insert last output" asrepl-insert-last-ouput t]
         "--"
         ["Switch to REPL" asrepl-switch-to-repl t]))
     map)
