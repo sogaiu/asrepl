@@ -205,6 +205,7 @@ Host and port should be delimited with ':'."
         ["Send region" asrepl-send-region t]
         ["Insert last output" asrepl-insert-last-ouput t]
         "--"
+        ["Start REPL" asrepl t]
         ["Switch to REPL" asrepl-switch-to-repl t]))
     map)
   "Asrepl interaction mode map.")
