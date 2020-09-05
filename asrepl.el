@@ -193,7 +193,7 @@ Host and port should be delimited with ':'."
 (defvar asrepl-interaction-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-b" 'asrepl-send-buffer)
-    (define-key map "\C-c\C-e" 'asrepl-send-expression-at-point)
+    (define-key map "\C-x\C-e" 'asrepl-send-expression-at-point)
     (define-key map "\C-c\C-r" 'asrepl-send-region)
     (define-key map "\C-c\C-i" 'asrepl-insert-last-output)
     (define-key map "\C-c\C-z" 'asrepl-switch-to-repl)
