@@ -60,6 +60,56 @@
   (interactive)
   (asrepl-clojure-load-file (buffer-file-name)))
 
+(defun asrepl-load-minibuffer-history-with-endpoints ()
+  "Update `minibuffer-history` using enum-repls, if available."
+  (when (executable-find "enum-repls")
+    (when-let ((project-dir (cdr (project-current))))
+      (let ((ports
+             (thread-last
+                 (process-lines "enum-repls"
+                                (file-truename project-dir))
+              (seq-map (lambda (line)
+                         (nth 1 (split-string line)))))))
+        (seq-do (lambda (elt)
+                  (add-to-history #'minibuffer-history
+                                  (format "localhost:%s" elt)))
+                ports)))))
+
+;;;###autoload
+(defun asrepl-clojure (endpoint)
+  "Start asrepl.
+
+Query user for ENDPOINT which specifies the socket REPL
+endpoint.  ENDPOINT is a string of the form: \"hostname:port\"."
+  (interactive
+   (if (not (buffer-file-name)) ; XXX: loose
+       (user-error "Please invoke when visiting a Clojure file")
+     (let ((endpoint
+            (or
+             (if-let ((a-port
+                       (nth 0
+                            (asrepl-load-minibuffer-history-with-endpoints))))
+                 (format "localhost:%s" a-port)
+               asrepl-default-endpoint))))
+       (list
+        (read-string (format "REPL endpoint (default '%s'): " endpoint)
+                     endpoint nil endpoint)))))
+  (unless
+      ;(ignore-errors ;; XXX: uncomment at some point...
+        (let* ((ep (split-string endpoint ":"))
+               (host (car ep))
+               (port (string-to-number (cadr ep))))
+          (message "Connecting to socket REPL on '%s:%d'..." host port)
+          (with-current-buffer (get-buffer-create asrepl-repl-buffer-name)
+            (prog1
+                (make-comint-in-buffer "asrepl" asrepl-repl-buffer-name
+                                       (cons host port))
+              (goto-char (point-max))
+              (asrepl-mode)
+              (pop-to-buffer (current-buffer))
+              (goto-char (point-max)))))
+    (message "Failed to connect to %s" endpoint)))
+
 (provide 'asrepl-clojure)
 
 ;;; asrepl-clojure.el ends here
