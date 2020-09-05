@@ -60,6 +60,20 @@
   (interactive)
   (asrepl-clojure-load-file (buffer-file-name)))
 
+(defun asrepl-clojure-load-buffer-file-and-switch-to-ns ()
+  "Send the `load-file` form with buffer's full path."
+  (interactive)
+  (when (executable-find "alc.detect-ns")
+    (let ((file-path (buffer-file-name)))
+      (condition-case nil
+          (let ((lines (process-lines "alc.detect-ns" file-path)))
+            ;; XXX: check for sane values?
+            (when (not lines)
+              (error "Failed to determine namespace for: %s" file-path))
+            (asrepl-send-code (format "(do (load-file \"%s\") (in-ns '%s))"
+                                      file-path
+                                      (first lines))))))))
+
 (defun asrepl-load-minibuffer-history-with-endpoints ()
   "Update `minibuffer-history` using enum-repls, if available."
   (when (executable-find "enum-repls")
