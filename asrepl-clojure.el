@@ -68,11 +68,13 @@
       (condition-case nil
           (let ((lines (process-lines "alc.detect-ns" file-path)))
             ;; XXX: check for sane values?
-            (when (not lines)
-              (error "Failed to determine namespace for: %s" file-path))
-            (asrepl-send-code (format "(do (load-file \"%s\") (in-ns '%s))"
-                                      file-path
-                                      (first lines))))))))
+            (if (not (string-equal (car lines) ""))
+              (asrepl-send-code (format "(do (load-file \"%s\") (in-ns '%s))"
+                                        file-path
+                                        (first lines)))
+              ;; XXX: throw error instead?
+              (error "Failed to detect ns for: %s" file-path)))
+        (error (message "Failed to detect ns for: %s" file-path))))))
 
 (defun asrepl-load-minibuffer-history-with-endpoints ()
   "Update `minibuffer-history` using enum-repls, if available."
