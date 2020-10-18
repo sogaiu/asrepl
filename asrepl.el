@@ -203,7 +203,7 @@ Host and port should be delimited with ':'."
         ["Send buffer" asrepl-send-buffer t]
         ["Send expression at point" asrepl-send-expression-at-point t]
         ["Send region" asrepl-send-region t]
-        ["Insert last output" asrepl-insert-last-ouput t]
+        ["Insert last output" asrepl-insert-last-output t]
         "--"
         ["Start REPL" asrepl t]
         ["Switch to REPL" asrepl-switch-to-repl t]))
