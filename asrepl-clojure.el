@@ -122,8 +122,10 @@ endpoint.  ENDPOINT is a string of the form: \"hostname:port\"."
                                        (cons host port))
               (goto-char (point-max))
               (asrepl-mode)
-              (pop-to-buffer (current-buffer))
-              (goto-char (point-max)))))
+              ;; XXX: seems more useful to stay in code buffer
+              ;;(pop-to-buffer (current-buffer))
+              ;;(goto-char (point-max))
+              )))
     (message "Failed to connect to %s" endpoint)))
 
 (provide 'asrepl-clojure)
