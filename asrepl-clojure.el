@@ -114,7 +114,8 @@ endpoint.  ENDPOINT is a string of the form: \"hostname:port\"."
       ;(ignore-errors ;; XXX: uncomment at some point...
         (let* ((ep (split-string endpoint ":"))
                (host (car ep))
-               (port (string-to-number (cadr ep))))
+               (port (string-to-number (cadr ep)))
+               (code-buffer (current-buffer)))
           (message "Connecting to socket REPL on '%s:%d'..." host port)
           (with-current-buffer (get-buffer-create asrepl-repl-buffer-name)
             (prog1
@@ -122,10 +123,9 @@ endpoint.  ENDPOINT is a string of the form: \"hostname:port\"."
                                        (cons host port))
               (goto-char (point-max))
               (asrepl-mode)
-              ;; XXX: seems more useful to stay in code buffer
-              ;;(pop-to-buffer (current-buffer))
-              ;;(goto-char (point-max))
-              )))
+              (pop-to-buffer (current-buffer))
+              (goto-char (point-max))
+              (pop-to-buffer code-buffer))))
     (message "Failed to connect to %s" endpoint)))
 
 (provide 'asrepl-clojure)
